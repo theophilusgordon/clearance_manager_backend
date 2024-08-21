@@ -23,7 +23,6 @@ class AdminManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
 
 class Admin(AbstractBaseUser):
-    id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True)
     full_name = models.CharField(max_length=255)
     admin_number = models.CharField(max_length=20, unique=True)
@@ -59,10 +58,10 @@ class StudentManager(BaseUserManager):
         return self.create_user(email, reference_number, password, **extra_fields)
 
 class Student(AbstractBaseUser):
-    id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     reference_number = models.CharField(max_length=20, unique=True)
+    department = models.CharField(max_length=50)
     gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
     level = models.CharField(max_length=10)
     phone_number = models.CharField(max_length=15)
