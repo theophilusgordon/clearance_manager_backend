@@ -1,15 +1,16 @@
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework import status
+from rest_framework import generics
 from rest_framework.generics import ListAPIView
 from rest_framework.authentication import TokenAuthentication
-from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
-from .serializers import StudentSerializer, DepartmentSerializer, PasswordUpdateSerializer
-from .models import Student, Admin, Department
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializers import StudentSerializer, DepartmentSerializer, PasswordUpdateSerializer, DepartmentClearanceSerializer
+from .models import Student, Admin, Department, DepartmentClearance
 
 class CustomObtainAuthToken(ObtainAuthToken):
     user_model = None
@@ -108,3 +109,7 @@ class PasswordUpdateView(APIView):
             return Response({"message": "Password updated successfully!"}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class DepartmentClearanceListView(generics.ListAPIView):
+    queryset = DepartmentClearance.objects.all()
+    serializer_class = DepartmentClearanceSerializer

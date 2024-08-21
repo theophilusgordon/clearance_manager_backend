@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class Department(models.Model):
@@ -57,6 +58,23 @@ class StudentManager(BaseUserManager):
         extra_fields.setdefault('is_admin', True)
         return self.create_user(email, reference_number, password, **extra_fields)
 
+class DepartmentClearance(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+
+    id = models.AutoField(primary_key=True)
+    clearance_start_date = models.DateField()
+    description = models.TextField()
+    department = models.ForeignKey(Department, to_field='code', on_delete=models.CASCADE, related_name='clearances')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='clearances')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_cleared')
+
+    def __str__(self):
+        return f"{self.department.name} - {self.user.full_name} - {self.status}"
+    
 class Student(AbstractBaseUser):
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
@@ -67,6 +85,7 @@ class Student(AbstractBaseUser):
     phone_number = models.CharField(max_length=15)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    departmentClearance = models.ForeignKey(DepartmentClearance, blank=True, on_delete=models.CASCADE, related_name='students')
 
     objects = StudentManager()
 
@@ -79,3 +98,4 @@ class Student(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+

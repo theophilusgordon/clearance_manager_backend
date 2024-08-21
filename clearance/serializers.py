@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, Admin, Department
+from .models import Student, Admin, Department, DepartmentClearance
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +31,8 @@ class PasswordUpdateSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
     confirm_password = serializers.CharField(required=True)
+    
+class DepartmentClearanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DepartmentClearance
+        fields = ['id', 'clearance_start_date', 'description', 'department', 'user', 'status']
