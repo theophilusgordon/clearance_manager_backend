@@ -1,13 +1,13 @@
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import StudentSerializer
-from .models import Student, Admin
+from .serializers import StudentSerializer, DepartmentSerializer
+from .models import Student, Admin, Department
 
 class CustomObtainAuthToken(ObtainAuthToken):
     user_model = None
@@ -48,3 +48,11 @@ class StudentRegistrationView(APIView):
             serializer.save()
             return Response({"message": "Student registered successfully!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class DepartmentListView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensures that only authenticated users can access this view
+
+    def get(self, request):
+        departments = Department.objects.all()
+        serializer = DepartmentSerializer(departments, many=True)
+        return Response(serializer.data)
