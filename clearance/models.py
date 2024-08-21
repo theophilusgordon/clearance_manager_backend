@@ -58,6 +58,7 @@ class StudentManager(BaseUserManager):
         return self.create_user(email, reference_number, password, **extra_fields)
 
 class Student(AbstractBaseUser):
+    id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     reference_number = models.CharField(max_length=20, unique=True)

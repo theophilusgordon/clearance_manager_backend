@@ -56,3 +56,14 @@ class DepartmentListView(APIView):
         departments = Department.objects.all()
         serializer = DepartmentSerializer(departments, many=True)
         return Response(serializer.data)
+    
+class UserDetailView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensures that only authenticated users can access this view
+
+    def get(self, request, user_id):
+        try:
+            user = Student.objects.get(id=user_id)
+            serializer = StudentSerializer(user)
+            return Response(serializer.data)
+        except Student.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
