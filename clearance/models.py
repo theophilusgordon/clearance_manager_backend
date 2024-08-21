@@ -64,8 +64,6 @@ class Student(AbstractBaseUser):
     gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
     level = models.CharField(max_length=10)
     phone_number = models.CharField(max_length=15)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 

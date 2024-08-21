@@ -4,38 +4,47 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.generics import ListAPIView
 from rest_framework.authentication import TokenAuthentication
+from rest_framework import status
+from rest_framework.views import APIView
 from .serializers import StudentSerializer
 from .models import Student, Admin
 
-class StudentLoginView(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        response = super(StudentLoginView, self).post(request, *args, **kwargs)
-        token = Token.objects.get(key=response.data['token'])
-        student = Student.objects.get(reference_number=request.data['username'])
-        return Response({
-            'token': token.key,
-            'student_id': student.id,
-            'reference_number': student.reference_number,
-            'full_name': student.full_name,
-            'email': student.email,
-        })
+class CustomObtainAuthToken(ObtainAuthToken):
+    user_model = None
 
-class AdminLoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-        response = super(AdminLoginView, self).post(request, *args, **kwargs)
-        token = Token.objects.get(key=response.data['token'])
-        admin = Admin.objects.get(email=request.data['username'])
-        return Response({
-            'token': token.key,
-            'admin_id': admin.id,
-            'username': admin.username,
-            'email': admin.email,
-            'full_name': admin.full_name,
-        })
+        response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
+        try:
+            token = Token.objects.get(key=response.data['token'])
+            user = self.user_model.objects.get(username=request.data['username'])
+            return Response({
+                'token': token.key,
+                'user_id': user.id,
+                'username': user.username,
+                'full_name': user.full_name,
+                'email': user.email,
+            })
+        except Token.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except self.user_model.DoesNotExist:
+            return Response({'error': 'Invalid username'}, status=status.HTTP_400_BAD_REQUEST)
 
+class StudentLoginView(CustomObtainAuthToken):
+    user_model = Student
+
+class AdminLoginView(CustomObtainAuthToken):
+    user_model = Admin
 
 class StudentListView(ListAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
+    
+class StudentRegistrationView(APIView):
+    def post(self, request):
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Student registered successfully!"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -72,6 +72,16 @@ AUTH_USER_MODEL = 'clearance.Admin'
 
 WSGI_APPLICATION = 'clearance_manager_backend.wsgi.application'
 
+# Authentication Token
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+		'EXCEPTION_HANDLER': 'clearance.exceptions.custom_exception_handler',
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
