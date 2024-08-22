@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.utils import timezone
+
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
@@ -48,6 +50,10 @@ class StudentManager(BaseUserManager):
     def create_user(self, email, reference_number, password=None, **extra_fields):
         if not email:
             raise ValueError("The Email field must be set")
+        if not reference_number:
+            raise ValueError("The Reference Number field must be set")
+        if not password:
+            raise ValueError("The Password field must be set")
         email = self.normalize_email(email)
         student = self.model(email=email, reference_number=reference_number, **extra_fields)
         student.set_password(password)
@@ -85,12 +91,13 @@ class Student(AbstractBaseUser):
     phone_number = models.CharField(max_length=15)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    departmentClearance = models.ForeignKey(DepartmentClearance, blank=True, on_delete=models.CASCADE, related_name='students')
+    date_joined = models.DateTimeField(default=timezone.now)
+
 
     objects = StudentManager()
 
     USERNAME_FIELD = 'reference_number'
-    REQUIRED_FIELDS = ['email', 'full_name']
+    REQUIRED_FIELDS = ['email', 'full_name', 'reference_number', 'password']
 
     def __str__(self):
         return self.full_name
@@ -98,4 +105,3 @@ class Student(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
-

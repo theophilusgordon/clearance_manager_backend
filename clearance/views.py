@@ -46,6 +46,7 @@ class StudentListView(ListAPIView):
     permission_classes = [IsAdminUser]
     
 class StudentRegistrationView(APIView):
+    permission_classes = [] 
     def post(self, request):
         serializer = StudentSerializer(data=request.data)
         if serializer.is_valid():

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
 		'rest_framework',
 		'rest_framework.authtoken',
+		'corsheaders',
 		'clearance'
 ]
 
@@ -48,9 +49,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+		'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'clearance_manager_backend.urls'
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
@@ -71,6 +75,11 @@ TEMPLATES = [
 AUTH_USER_MODEL = 'clearance.Admin'
 
 WSGI_APPLICATION = 'clearance_manager_backend.wsgi.application'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    'clearance_manager_backend.auth_backends.AdminStudentBackend',  # Custom backend
+]
 
 # Authentication Token
 REST_FRAMEWORK = {

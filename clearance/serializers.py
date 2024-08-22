@@ -6,14 +6,13 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = ['full_name', 'email', 'reference_number', 'department', 'gender', 'level', 'phone_number', 'password']
         extra_kwargs = {
-            'password': {'write_only': True}
+					'password': {'write_only': True}
         }
 
     def create(self, validated_data):
-        password = validated_data.pop('password', '1234')
-        student = Student.objects.create(**validated_data)
-        if password:
-            student.set_password(password)
+        password = validated_data.pop('password')
+        student = Student(**validated_data)
+        student.set_password(password)
         student.save()
         return student
 
